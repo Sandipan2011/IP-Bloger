@@ -1,84 +1,184 @@
-# Firewall GUI Controller
+# 🛡️ IP-Bloger
 
-A Python-based graphical user interface (GUI) application for managing firewall rules on Linux systems using iptables. This tool allows users to block/unblock IP addresses, view current rules, monitor logs, and automatically block IPs based on failed login attempts.
+> A lightweight Linux firewall management desktop application built with **Python**, **Tkinter**, and **iptables**.
 
-## Features
+[![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Linux](https://img.shields.io/badge/Platform-Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://www.linux.org/)
+[![Firewall](https://img.shields.io/badge/Firewall-iptables-red?style=for-the-badge)](https://www.netfilter.org/projects/iptables/index.html)
+[![GUI](https://img.shields.io/badge/GUI-Tkinter-2E8B57?style=for-the-badge)](https://docs.python.org/3/library/tkinter.html)
 
-- **Manual IP Blocking/Unblocking**: Block or unblock specific IP addresses with optional port and protocol filtering.
-- **Temporary Blocking**: Block an IP for a specified duration.
-- **View Rules**: Display current iptables rules.
-- **Auto Blocking**: Automatically block IPs after a configurable number of failed login attempts (monitors /var/log/auth.log).
-- **Logging**: Export and view logs of actions performed.
-- **GUI Interface**: User-friendly Tkinter-based interface.
+IP-Bloger provides a simple graphical interface for managing Linux firewall rules without requiring users to remember complex `iptables` commands. It supports manual IP blocking, temporary blocks, rule inspection, action logging, and automatic blocking after repeated failed authentication attempts.
 
-## Requirements
+> [!WARNING]
+> This application changes your system firewall and requires elevated privileges. Test it in a safe environment first. Incorrect rules can interrupt SSH access or other network services.
 
+---
+
+## ✨ Features
+
+- 🚫 **Block IP addresses** manually with optional port and protocol filtering.
+- ✅ **Unblock IP addresses** by removing matching `iptables` rules.
+- ⏱️ **Temporary blocking** with automatic removal after a configurable duration.
+- 🔍 **View active firewall rules** and blocked IP ranges.
+- 🤖 **Automatic IP blocking** after repeated failed login attempts.
+- 📖 **Authentication-log monitoring** using `/var/log/auth.log`.
+- 📝 **Local activity logging** with log viewing, clearing, and export support.
+- 🖥️ **Dark-themed Tkinter interface** with interactive controls.
+
+## 🧰 Tech stack
+
+| Technology | Purpose |
+| --- | --- |
+| [Python 3](https://www.python.org/) | Application logic |
+| [Tkinter](https://docs.python.org/3/library/tkinter.html) | Desktop graphical interface |
+| [iptables](https://www.netfilter.org/projects/iptables/index.html) | Linux firewall rule management |
+| `threading` | Background log monitoring and temporary blocks |
+
+## ✅ Requirements
+
+- Linux operating system
 - Python 3.x
-- Tkinter (usually included with Python, but install if missing)
-- iptables (standard on Linux systems)
-- sudo privileges for iptables commands
+- `iptables` installed and available on `PATH`
+- Tkinter support for Python
+- `sudo` privileges for firewall operations
+- Read access to an authentication log, normally `/var/log/auth.log`
 
-## Installation
+## 🚀 Installation
 
-1. **Clone or Download the Repository**:
-   ```
-   git clone https://github.com/yourusername/firewall-gui-controller.git
-   cd firewall-gui-controller
-   ```
+### 1. Clone the repository
 
-2. **Install Dependencies** (if needed):
-   - On Debian-based systems (like Kali Linux):
-     ```
-     sudo apt update
-     sudo apt install python3-tk
-     ```
-   - Tkinter is usually pre-installed with Python 3. If not, the above command will install it.
+```bash
+git clone https://github.com/Sandipan2011/IP-Bloger.git
+cd IP-Bloger
+```
 
-3. **Ensure iptables is available**:
-   - iptables is typically installed by default on Linux. Verify with:
-     ```
-     sudo iptables -L
-     ```
+### 2. Install Tkinter
 
-## Usage
+On Debian-based distributions such as Ubuntu, Debian, or Kali Linux:
 
-1. **Run the Application**:
-   - To run the GUI:
-     ```
-     sudo python3 firewall_gui.py
-     ```
-     **Note**: sudo is required because the script executes iptables commands, which need root privileges.
+```bash
+sudo apt update
+sudo apt install -y python3-tk iptables
+```
 
-2. **Using the GUI**:
-   - Enter an IP address in the input field.
-   - Optionally specify port and protocol (tcp/udp).
-   - Click buttons to block/unblock IPs, view rules, etc.
-   - For auto-blocking: Click "Start Auto IP Block" to begin monitoring failed login attempts.
-   - Logs are displayed in the text area and can be exported to a file.
+> Package names may differ on Fedora, Arch, and other distributions. Install the equivalent Python Tkinter package for your system.
 
-3. **Auto Blocking Configuration**:
-   - The script monitors `/var/log/auth.log` for failed password attempts.
-   - After 5 failed attempts from the same IP, it automatically blocks that IP.
-   - You can adjust `max_failed_attempts` in the code if needed.
+### 3. Verify the firewall dependency
 
-## Important Notes
+```bash
+sudo iptables -L
+```
 
-- **Security**: This tool modifies firewall rules. Use with caution and ensure you understand the implications of blocking IPs.
-- **Log File**: The auto-blocking feature reads from `/var/log/auth.log`. Ensure this file exists and is readable.
-- **Sudo Requirements**: All iptables commands require sudo. If you prefer not to run the entire script as root, you could modify the code to prompt for password or use sudo only for specific commands.
-- **Testing**: Test in a safe environment before using in production.
+## ▶️ Run the application
 
-## Troubleshooting
+Start the GUI with elevated privileges because the application executes firewall commands:
 
-- If Tkinter is not found: Install with `sudo apt install python3-tk`
-- If iptables commands fail: Ensure you have sudo privileges and iptables is installed.
-- Permission issues with log file: The script needs read access to `/var/log/auth.log`. If issues arise, check file permissions.
+```bash
+sudo python3 firewall_gui.py
+```
 
-## Contributing
+## 🖱️ How to use
 
-Feel free to submit issues, feature requests, or pull requests.
+1. Enter an IP address.
+2. Optionally enter a destination port and choose `tcp` or `udp`.
+3. Select an action:
+   - **Block IP** — add a permanent `DROP` rule.
+   - **Unblock IP** — remove the matching `DROP` rule.
+   - **Block IP Temporarily** — block an IP for a number of seconds.
+   - **View Rules** — display the current `iptables` rules.
+   - **View Blocked IP Ranges** — show rules containing `DROP`.
+   - **Start Auto IP Block** — monitor authentication failures.
+   - **Stop Auto IP Block** — stop background monitoring.
+4. Use **Export Log** to save the current output to `firewall_log.txt`.
 
-## License
+## 🤖 Automatic blocking
 
-This project is open-source. Please check the license file for details.
-# IP-Bloger
+When automatic blocking is enabled, the application follows `/var/log/auth.log` and looks for `Failed password` entries. It extracts IPv4 addresses and tracks failed attempts in memory. An address is automatically blocked after **5 failed attempts** by default.
+
+To change the threshold, update `max_failed_attempts` in `firewall_gui.py`:
+
+```python
+max_failed_attempts = 5
+```
+
+> [!NOTE]
+> Automatic blocking currently expects authentication messages in a format containing `from <IPv4 address>` and is primarily designed for Linux systems that use `/var/log/auth.log`. Systems using another log path or format may require configuration changes.
+
+## 📁 Project structure
+
+```text
+IP-Bloger/
+├── firewall_gui.py       # Main Tkinter application
+├── README.md             # Project documentation
+├── docs/
+│   └── README.md         # Additional documentation
+└── .gitignore
+```
+
+## 🔐 Security considerations
+
+- Review every rule before applying it to a production machine.
+- Keep a second administrative session available when testing firewall changes remotely.
+- Be careful not to block your own management IP address.
+- Use `sudo` only when necessary and understand the commands being executed.
+- Validate IP addresses, ports, and protocols before using the application.
+- Test temporary and automatic blocking in an isolated environment.
+- Remember that firewall rules may not persist after a reboot unless your distribution is configured to save them.
+
+## 🐛 Troubleshooting
+
+### Tkinter is unavailable
+
+```bash
+sudo apt install -y python3-tk
+```
+
+### `iptables` commands fail
+
+Confirm that `iptables` is installed and that the application is started with `sudo`:
+
+```bash
+command -v iptables
+sudo iptables -L
+sudo python3 firewall_gui.py
+```
+
+### Authentication-log monitoring does not work
+
+Check that the expected log file exists and is readable:
+
+```bash
+ls -l /var/log/auth.log
+sudo tail -f /var/log/auth.log
+```
+
+Some distributions use `/var/log/secure` or a systemd journal instead. Update the log path and parsing logic in `firewall_gui.py` when necessary.
+
+## 🗺️ Roadmap
+
+- [ ] Add input validation for IP addresses, ports, and protocols.
+- [ ] Add configurable authentication-log paths and failure thresholds.
+- [ ] Improve support for different Linux authentication-log formats.
+- [ ] Add safer privilege handling without running the full GUI as root.
+- [ ] Add rule persistence and restoration support.
+- [ ] Add automated tests for firewall command construction.
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+1. Fork the repository.
+2. Create a feature branch: `git checkout -b feature/my-change`
+3. Make and test your changes in a safe Linux environment.
+4. Commit your changes: `git commit -m "Add my change"`
+5. Push the branch and open a pull request.
+
+For bugs and feature requests, please open a [GitHub issue](https://github.com/Sandipan2011/IP-Bloger/issues).
+
+## 📄 License
+
+No license file is currently included in the repository. Add a `LICENSE` file before distributing or reusing this project so that permissions are clearly defined.
+
+## ⭐ Support
+
+If IP-Bloger is useful to you, consider starring the repository and sharing feedback through [issues](https://github.com/Sandipan2011/IP-Bloger/issues).
